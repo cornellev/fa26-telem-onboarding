@@ -1,25 +1,11 @@
 # Data Transfer Workshop: UDP
 
-In this coding activity, you'll build a real-time telemetry system that sends simulated race car sensor readings from one computer to another using Python and UDP.
-
-You'll work in pairs:
-- **Sender (`sender.py`):** Simulates the race car and transmits sensor readings.
-- **Receiver (`receiver.py`):** Simulates the pit crew and displays incoming telemetry.
-
-You'll work on the **same Git branch** as your partner, implementing separate files before combining your code and testing the system.
-
-**Duration:** Approximately 40 minutes
+In this coding activity, you will work in pairs to build a real-time telemetry system that sends simulated race car sensor readings between two computers using Python and UDP. 
+- **Sender (`sender.py`):** Simulates the car and sends sensor readings
+- **Receiver (`receiver.py`):** Simulates the pit and displays incoming sensor readings
 
 ## Setup
-
-You'll need:
-- Python 3 ([download here](https://www.python.org/downloads/))
-- Git ([download here](https://git-scm.com/downloads))
-- The workshop repository
-
-No additional Python packages are required.
-
-To verify that Python is installed, open a terminal and run:
+We will use [Python 3](https://www.python.org/downloads/)'s built in libraries. To verify that  Python is installed, open a terminal and run:
 
 **macOS:**
 ```bash
@@ -31,93 +17,45 @@ python3 --version
 python --version
 ```
 
-To verify Git is installed:
-
-```bash
-git --version
-```
-
 ## Background
-
-### Telemetry System
 
 Recall that our telemetry system follows these steps:
 
 1. **Data Collection:** Get sensor readings from the car.
-2. **Serialization:** Convert sensor data into a format suitable for transmission.
-3. **Transmission:** Send the data to the pit crew.
+2. **Serialization:** Convert sensor data into a format that can be transmitted (in our case, bits).
+3. **Transmission:** Send data from the car to the pit.
 4. **Reception:** Receive the transmitted data.
-5. **Deserialization:** Reconstruct the original data.
-6. **Storage & Visualization:** Store and display the sensor readings.
+5. **Deserialization:** Convert the binary data back into sensor readings.
+6. **Visualization:** Display the sensor readings.
 
-For simplicity, we'll use **JSON instead of Protobuf** for serialization and deserialization, since JSON is built into Python. We'll use **UDP** to transmit data between computers.
+For this workshop, we will use JSON instead of Protobuf for (de)serialization, and UDP to send the data. Below are a couple of helpful definitions for this activity: 
+- **UDP** sends individual packets without establishing a connection or guaranteeing that the receiver receives the packets
+- An **IP address** identifies the computer that is receiving data (starter code uses `5005`)
+- A **port** identifies the receiving program on the receiving computer (starter code uses `5005`)
 
-Our workshop follows this pipeline:
+At a high level, because UDP sends bytes, the sender will convert a Python dictionary into JSON and encode it as UTF-8 bytes. The receiver will reverse these steps.
 
-**Data Generation → JSON Serialization → UDP Transmission → Reception → JSON Deserialization → Display**
+## Instructions
 
-### UDP Basics
-
-A few networking concepts to know:
-
-- **IP Address:** Identifies the computer we're sending data to.
-- **Port:** Identifies the program receiving the data. We'll use port `5005`.
-- **UDP (User Datagram Protocol):** Transmits data in individual packets called *datagrams*. Unlike TCP, UDP doesn't establish a connection or guarantee packet delivery or ordering.
-
-Since UDP transmits bytes, we'll convert our Python dictionary into JSON text, then encode it into bytes. The receiver reverses these steps to recover the original dictionary.
-
-## 1. Set Up Your Git Branch (5 minutes)
-
-You'll be working on the **same Git branch** as your partner, but each of you will implement a different file.
-
-**Step 1: Clone the repository**
-
-If you haven't already, clone the workshop repository:
+### 1. Set up your Git branch
+One person will implement `sender.py`, and the other will implement `receiver.py`. If you have not already, clone the repository:
 
 ```bash
-git clone <repository-url>
-cd udp-telemetry-workshop
+git clone https://github.com/cornellev/fa26-telem-onboarding
+cd fa26-telem-onboarding
+cd data-transfer
 ```
 
-Replace `<repository-url>` with the GitHub repository URL provided by the instructor.
+Create and push a new branch for you and your partner.
 
-**Step 2: Create a branch for your pair**
+### 2. Data message format 
+We will be using this schema for the data packets:
 
-One person creates a new branch and pushes it to GitHub:
-
-```bash
-git switch -c udp-telemetry-team1
-git push -u origin udp-telemetry-team1
-```
-
-Replace `team1` with your pair's assigned team number.
-
-**Step 3: Have your partner switch to the same branch**
-
-Your partner runs:
-
-```bash
-git fetch origin
-git switch --track origin/udp-telemetry-team1
-```
-
-**Step 4: Assign roles**
-
-Decide who will implement `sender.py` and who will implement `receiver.py`.
-
-Both partners should work on the same branch, but **only edit your assigned file** to avoid merge conflicts.
-
-## 2. Understand the Telemetry Message (5 minutes)
-
-We've already defined the telemetry message format you'll use for this activity. Both the sender and receiver will follow the same JSON structure so they agree on what data is being transmitted.
-
-Your messages will contain the following sensor readings:
-
-| Key | Sensor Reading | Simulated Range |
-|---|---|---|
-| `speed` | Speed (km/h) | 0–100 |
-| `voltage` | Battery voltage (V) | 300–400 |
-| `battery` | Battery charge (%) | 0–100 |
+| Key | Type | Sensor Reading | Range |
+|---|--- | ---|---|
+| `speed` | `float` | Speed (km/h) | 0–100 |
+| `voltage` |  `float` | Battery voltage (V) | 300–400 |
+| `battery` |  `float` | Battery charge (%) | 0–100 |
 
 Example JSON message:
 
@@ -125,259 +63,57 @@ Example JSON message:
 {"speed": 42.3, "voltage": 367.8, "battery": 82.1}
 ```
 
-The sender will generate random values for these fields, and the receiver will decode and display them.
+The sender will generate random readings, and the receiver will decode and print them. 
 
-## 3. Complete the TODOs (15 minutes)
+### 3. Complete the TODOs 
 
-Each starter file contains TODOs for you to implement. The socket setup and cleanup are already provided, so you can focus on the telemetry pipeline.
+Each starter file has four TODOs for you to implement. The socket setup is already provided.
 
-Replace the `pass` statements with your code. In `receiver.py`, also replace the `raise NotImplementedError(...)` statement.
+#### Sender (`sender.py`)
+Your goal is to generate and send one new set of readings every second.
+1. **TODO 1: Generate readings.** Use `random.uniform(low, high)` to generate random values for `speed`, `voltage`, and `battery` within the ranges above. You can use `round(value, 1)` to keep one decimal place, if you'd like.
+2. **TODO 2: Create a dictionary.** Store the sensor readings in a dictionary with the keys `speed`, `voltage`, and `battery`.
+3. **TODO 3: Serialize the dictionary.** Use `json.dumps()` to convert the dictionary to a JSON string, then call `.encode("utf-8")` to convert it into bytes.
+4. **TODO 4: Send the serialized data.** Use `sock.sendto()` to send those bytes to `(args.receiver_ip, PORT)`.
 
-### Student A: Sender (`sender.py`)
+Keep `time.sleep(1)` in the loop for now, so that the sender publishes at 1 Hz (i.e. once per second). 
 
-Your goal is to generate simulated sensor readings and transmit them once per second.
-
-**TODO 1: Generate sensor readings**
-
-Inside the loop, generate three random values:
-- `speed`: Between 0 and 100
-- `voltage`: Between 300 and 400
-- `battery`: Between 0 and 100
-
-Use `random.uniform(low, high)` to generate random decimal values and `round(value, 1)` to round them to one decimal place.
-
-**TODO 2: Create a telemetry dictionary**
-
-Store the readings in a dictionary named `telemetry`, using the keys `speed`, `voltage`, and `battery`.
-
-Remember that Python dictionaries use the following syntax:
-
-```python
-{"key": value, "another_key": value}
-```
-
-**TODO 3: Serialize the data**
-
-Convert the dictionary into JSON using `json.dumps()`, then encode the resulting string into bytes using `.encode("utf-8")`.
-
-Store the result in a variable named `message`.
-
-**TODO 4: Transmit the message**
-
-Use the UDP socket to send your message:
-
-```python
-sock.sendto(message, (args.receiver_ip, PORT))
-```
-
-The destination consists of the receiver's IP address and port.
-
-Keep `time.sleep(1)` so the sender transmits approximately once per second.
-
-### Student B: Receiver (`receiver.py`)
-
-Your goal is to receive incoming telemetry, reconstruct the data, and display the readings.
-
-**TODO 1: Receive incoming data**
-
-Use `sock.recvfrom(BUFFER_SIZE)` to receive a UDP packet.
-
-This returns two values:
-- `data`: The received bytes.
-- `sender_address`: The sender's IP address and port.
-
-Store both values in their corresponding variables.
-
-**TODO 2: Deserialize the data**
-
-First, decode the received bytes into a string using:
-
-```python
-data.decode("utf-8")
-```
-
-Then convert the JSON string back into a Python dictionary using `json.loads()`.
-
-Store the resulting dictionary in `telemetry`.
-
-**TODO 3: Extract sensor readings**
-
-Retrieve the speed, voltage, and battery readings from the dictionary.
-
-For example:
-
-```python
-speed = telemetry["speed"]
-```
-
-**TODO 4: Display the telemetry**
-
-Print all three readings, including their units, on one line using an f-string.
-
-For example:
-
+#### Receiver (`receiver.py`)
+Your goal is to receiver the data and display the readings. 
+1. **TODO 1: Receive the incoming data.** Use `sock.recvfrom(BUFFER_SIZE)` to get both the incoming bytes and sender address.
+2. **TODO 2: Deserialize the data.** Decode the bytes using `.decode("utf-8")`, then use `json.loads()` to reconstruct the JSON dictionary.
+3. **TODO 3: Extract the sensor readings.** Read `speed`, `voltage`, and `battery` from the dictionary.
+4. **TODO 4: Display the data.** Print all three readings with their units. Use `flush=True` to display the output immediately. An example output should look something like this: 
 ```text
-Speed: 42.3 km/h | Voltage: 367.8 V | Battery: 82.1%
+Speed: 42.3 km/h | Voltage: 46.8 V | Battery: 82.1%
 ```
 
-Use `flush=True` in your `print()` call to display each reading immediately.
+### 4. Combine your code and test locally
+Push and pull your changes so you both have the completed `sender.py` and `receiver.py` files. 
 
-If you get stuck, refer to the corresponding file in the `solutions/` folder.
-
-## 4. Combine Your Code and Test Locally (5 minutes)
-
-Once you've both completed your TODOs, push your changes to your shared Git branch so both laptops have the completed sender and receiver files.
-
-### Step 1: Commit and push the first student's code
-
-The sender student runs:
-
+We are first going to test the two programs on **one computer**. Open two terminals in the repository folder (use `python3` instead if needed):
 ```bash
-git add sender.py
-git commit -m "Implement UDP telemetry sender"
-git push
-```
-
-### Step 2: Pull, commit, and push the second student's code
-
-After the sender has pushed, the receiver student runs:
-
-```bash
-git pull
-git add receiver.py
-git commit -m "Implement UDP telemetry receiver"
-git push
-```
-
-### Step 3: Sync both laptops
-
-The sender student runs:
-
-```bash
-git pull
-```
-
-Now both laptops should have the completed `sender.py` and `receiver.py`.
-
-### Step 4: Test on one computer
-
-Before transmitting data between laptops, test both programs locally.
-
-Open two terminals in the `udp-telemetry-workshop` directory.
-
-**Terminal 1: Start the receiver**
-
-```bash
+# Terminal 1 (receiver)
 python receiver.py
 ```
-
-**Terminal 2: Start the sender**
-
 ```bash
+# Terminal 2 (sender)
 python sender.py
 ```
+You should see a new set of sensor readings printed by the receiver approximately every second! Use `Ctrl+C` to stop either program.
 
-On macOS, use `python3` instead of `python` if needed.
+### 5. Test between two computers
+Once your local test works, let's try sending data from one laptop to the other!
+1. Connect both laptops to the same network (e.g. RedRover). 
+2. Find the receiver laptop's IP address:
+    - macOS: System settings -> Wi-Fi -> Details -> TCP/IP
+    - Windows: Run `ipconfig` and find the IPv4 Address for your active Wi-Fi adapter
+3. On the receiver laptop, run `python receiver.py`.
+4. On the sender laptop, run `python sender.py [receiver IP address]`.
 
-By default, the sender transmits to `127.0.0.1`, also known as **localhost**, which refers to the same computer.
+You can now verify to see if the receiver prints readings from the sender laptop!
 
-If everything works, your receiver should display something like:
-
-```text
-Pit crew listening on port 5005. Stop with Ctrl+C.
-
-Speed: 42.3 km/h | Voltage: 367.8 V | Battery: 82.1%
-Speed: 57.6 km/h | Voltage: 352.4 V | Battery: 79.5%
-Speed: 63.1 km/h | Voltage: 381.2 V | Battery: 76.8%
-```
-
-You should see a new reading approximately every second.
-
-Press `Ctrl+C` in both terminals to stop the programs.
-
-## 5. Connect Two Laptops (5 minutes)
-
-Now that your code works locally, try transmitting telemetry between your laptops.
-
-**Step 1: Connect to the same network**
-
-Connect both laptops to **RedRover (Cornell Wi-Fi)**.
-
-Being on the same Wi-Fi network doesn't necessarily mean devices can communicate directly. If RedRover blocks device-to-device traffic, you can continue testing using localhost or use an instructor-approved alternative network.
-
-**Step 2: Find the receiver's IP address**
-
-On the receiver's computer:
-
-- **macOS:** Open System Settings → Wi-Fi → Details → TCP/IP and find the IP address.
-- **Windows:** Open PowerShell or Command Prompt, run `ipconfig`, and find the IPv4 Address under your active Wi-Fi adapter.
-
-**Step 3: Start the receiver**
-
-On the receiver's laptop, run:
-
-```bash
-python receiver.py
-```
-
-**Step 4: Start the sender**
-
-On the sender's laptop, run:
-
-```bash
-python sender.py 192.168.1.42
-```
-
-Replace `192.168.1.42` with the receiver's actual IP address.
-
-The receiver is configured to listen on `0.0.0.0`, which means it accepts packets arriving through any local network interface. Do not use `0.0.0.0` as the sender's destination.
-
-**Step 5: Verify the connection**
-
-If everything is working, the receiver should display updated sensor readings from the sender's computer.
-
-**Note:** If localhost works but the two-laptop test doesn't, the issue may be network isolation rather than your code.
-
-## Troubleshooting
-
-| Problem | What to Check |
-|---|---|
-| No readings appear | Make sure the receiver is running, the TODOs are complete, and the IP address and port match. |
-| Localhost works, but two laptops don't | RedRover may restrict device-to-device communication. Try an instructor-approved alternative network or continue locally. |
-| `Address already in use` | Another receiver may already be using port `5005`. Stop it before restarting. |
-| `KeyError` or JSON error | Make sure both programs use the same dictionary keys and serialization format. |
-| Git push rejected | Commit your local changes if necessary, run `git pull` to incorporate your partner's changes, resolve any conflicts, and push again. |
-| Python command not found | Try `python3` on macOS or `py -3` on Windows. |
-
-If prompted by your operating system, allow Python to communicate on a trusted private network. Do not disable your firewall.
-
-## 6. Discussion and Bonus Challenge (5 minutes)
-
-Walk through the data-transfer pipeline with your partner and identify where each step occurs in your code.
-
-Consider these questions:
-
-1. Why do we need to serialize the sensor readings before transmitting them?
-2. What's the difference between an IP address and a port?
-3. What happens when the receiver is waiting for a packet?
-4. What happens to packets sent while the receiver isn't running?
-5. Why might UDP be useful for real-time telemetry despite not guaranteeing delivery?
-
-### Bonus: Detect Missing Packets
-
-If you have extra time, try adding sequence numbers to your telemetry messages.
-
-On the sender, add a `sequence` field that increases by one for every generated message. On the receiver, track the highest sequence number received and look for gaps.
-
-For example:
-
-```text
-Received packet #1
-Received packet #2
-Received packet #4
-Warning: Packet #3 may be missing!
-```
-
-To test your implementation, deliberately skip transmitting every fifth message while continuing to increment the sequence number.
-
-Sequence numbers help detect missing or out-of-order packets, but they don't guarantee delivery.
+## Bonus Challenges
+1. **Protobuf:** Our actual telemetry system uses [Protobuf](https://protobuf.dev/) to (de)serialize, rather than JSON. Try changing the sender and receiver to (de)serialize packets using a Protobuf message definition instead! (Hint: The Protobuf website should have very detailed instructions on how to do this.)
+2.  **Latency:** Recall that in an ideal setting, we would like to minimize latency (i.e. the delay between sending and receiving the data) in our system. Measure how long it takes for the data to get from the sender to the receiver. (Hint: Consider adding a timestamp to each message and comparing it with the receiver's time.)
+3. **Publishing frequency:** The starter code publishes at 1 Hz. Increase the frequency to 10 Hz, 50 Hz, and 100 Hz. Can the receiver keep up at each frequency?
