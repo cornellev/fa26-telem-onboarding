@@ -1,29 +1,29 @@
-"""CEV pit crew: complete the four TODOs, then run python receiver.py."""
+"""Complete 4 TODO's and run receiver.py"""
 
 import json
 import socket
+PORT = 5005  # Must match the sender's port (identifies the sender's program on a computer).
+BUFFER_SIZE = 4096  # Maximum bytes we expect to receive
 
-PORT = 5005  # Must match the sender's destination port.
-BUFFER_SIZE = 4096  # Maximum bytes to receive; plenty for our small JSON message.
-
-# UDP receives independent datagrams (messages), one recvfrom() call at a time.
+# Create a UDP socket 
 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-    # 0.0.0.0 listens on all local network interfaces, including localhost.
+    # SOCK_DGRAM selects UDP instead of TCP
+    # 0.0.0.0 listens on all local network interfaces
     sock.bind(("0.0.0.0", PORT))
-    print(f"Pit crew listening on port {PORT}. Stop with Ctrl+C.")
+    print(f"Receiver listening on port {PORT}. Stop with Ctrl+C.")
     try:
         while True:
-            # TODO 1: Receive bytes and the sender address with recvfrom().
-            # Replace this exception with your receiving code.
+            # TODO 1: Get both the data and the sender address using recvfrom().
+            # Replace this exception with your code.
             raise NotImplementedError("Complete the receiver TODOs first.")
 
-            # TODO 2: Decode UTF-8 bytes, then deserialize JSON into telemetry.
+            # TODO 2: Decode the UTF-8 bytes into a JSON string, then convert JSON back into a Python dictionary.
             pass
 
-            # TODO 3: Extract speed, voltage, and battery from telemetry.
+            # TODO 3: Extract the speed, voltage, and battery from the dictionary.
             pass
 
-            # TODO 4: Print the readings with labels, units, and one decimal.
+            # TODO 4: Print the readings to the terminal
             pass
     except KeyboardInterrupt:
-        print("\nPit crew stopped.")
+        print("Receiver stopped")
