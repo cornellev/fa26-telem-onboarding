@@ -85,7 +85,7 @@ Your goal is to receiver the data and display the readings.
 3. **TODO 3: Extract the sensor readings.** Read `speed`, `voltage`, and `battery` from the dictionary.
 4. **TODO 4: Display the data.** Print all three readings with their units. Use `flush=True` to display the output immediately. An example output should look something like this: 
 ```text
-Speed: 42.3 km/h | Voltage: 46.8 V | Battery: 82.1%
+Speed: 42.3 km/h | Voltage: 367.8 V | Battery: 82.1%
 ```
 
 ### 4. Combine your code and test locally
