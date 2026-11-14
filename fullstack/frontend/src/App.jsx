@@ -70,7 +70,12 @@ function PokemonCard({ pokemon }) {
 export default function App() {
   const [input, setInput] = useState("");
   const [search, setSearch] = useState({ name: "bulbasaur" });
-  const [pokemon, setPokemon] = useState(null);
+
+  /** TODO:
+   *  Create a new pokemon state and set its initial value to null
+   *  This will be used to store the pokemon data from the request
+   */
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -81,8 +86,9 @@ export default function App() {
 
     async function fetchPokemon() {
       try {
+        const name = encodeURIComponent(search.name);
         const response = await fetch(
-          `/api/pokemon/${encodeURIComponent(search.name)}`,
+          "TODO: Fetch the right API endpoint from your backend",
           { signal: controller.signal },
         );
         const data = await response.json();
@@ -154,7 +160,14 @@ export default function App() {
             {error}
           </p>
         ) : (
-          pokemon && <PokemonCard key={pokemon.id} pokemon={pokemon} />
+          pokemon &&
+          {
+            /**
+             *  TODO: Put the PokemonCard component here
+             *  Pass it the `pokemon` object state variable
+             *  as a prop
+             */
+          }
         )}
       </section>
     </main>
