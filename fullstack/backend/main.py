@@ -4,11 +4,14 @@ from fastapi import FastAPI, HTTPException
 app = FastAPI()
 
 
-@app.get("/api/pokemon/{name}")
+"""
+TODO: Use the FastAPI get decorator make this function
+a GET request for the endpoint /api/pokemon/{name}
+"""
 def get_pokemon(name: str):
     name = name.strip().lower()
     try:
-        response = httpx.get(f"https://pokeapi.co/api/v2/pokemon/{name}", timeout=10.0)
+        response = httpx.get("TODO: Put the right PokeAPI URL here", timeout=10.0)
         if response.status_code == 404:
             raise HTTPException(404, f'No Pokémon found for "{name}".')
         response.raise_for_status()
@@ -17,8 +20,8 @@ def get_pokemon(name: str):
 
     data = response.json()
     return {
-        "id": data["id"],
-        "name": data["name"],
+        "id": data["TODO: Put correct key based on schema"],
+        "name": data["TODO: Put correct key based on schema"],
         "image": data["sprites"].get("other", {}).get("official-artwork", {}).get("front_default")
         or data["sprites"].get("front_default"),
         "types": [entry["type"]["name"] for entry in data["types"]],
