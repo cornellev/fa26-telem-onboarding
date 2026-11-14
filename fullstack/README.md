@@ -24,7 +24,7 @@ docker compose down
 
 Requires Node.js 18+ and Python 3.10+. Run these commands from this `fullstack` directory in two terminals.
 
-**Terminal 1 — backend**
+**Backend Terminal**
 
 ```bash
 cd backend
@@ -36,7 +36,7 @@ python -m uvicorn main:app --reload
 
 The virtual environment keeps this project's Python packages in its own folder. Create it and install dependencies once; in a new terminal, activate it again before starting the backend. These commands use macOS/Linux shell syntax.
 
-**Terminal 2 — frontend**
+**Frontend Terminal**
 
 ```bash
 cd frontend
