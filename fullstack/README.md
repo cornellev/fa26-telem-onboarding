@@ -51,18 +51,3 @@ Open the local URL printed by Vite (normally http://localhost:5173). Vite forwar
 `frontend/src/App.jsx` submits searches to `GET /api/pokemon/{name}`. `backend/main.py` normalizes the name, fetches from [PokéAPI](https://pokeapi.co/docs/v2#pokemon), converts measurements to meters/kilograms, and returns just the card data. Each search makes one GET request to PokéAPI and returns a plain dictionary, without caching or custom Pydantic models. Missing Pokémon return 404; upstream failures return 502.
 
 Interactive endpoint documentation: http://127.0.0.1:8000/docs.
-
-## Verify
-
-```bash
-cd backend
-source .venv/bin/activate
-python -m unittest discover -s tests -v
-```
-
-```bash
-cd frontend
-npm run build
-```
-
-The frontend build is written to `frontend/dist`. For deployment, serve it behind a web server that forwards `/api` to FastAPI; Vite's development proxy does not apply to a static production build or `vite preview`.
