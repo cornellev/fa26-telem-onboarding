@@ -102,7 +102,8 @@ def get_lap_summary(run_id: int, lap_number: int) -> dict | str:
 
 # ---------------------------------------------------------------------------
 # TASK 1: get_fastest_laps
-#   1. Fill in the two ____ blanks in the SQL.
+#   1. Fill in the two ____ blanks in the SQL. JOIN ... ON says which column two
+#      tables share; get_lap_summary above has an example (ON s.lap_id = l.lap_id).
 #   2. Replace the docstring: say what question this answers and what `limit` is.
 #   3. Uncomment @mcp.tool() so the model can see it. Rerun chat.py and ask:
 #        Who set the fastest lap, and in which run?

@@ -68,6 +68,9 @@ laps     (lap_id, run_id, lap_number, lap_time_s)
 samples  (lap_id, t_ms, speed_mps, throttle_pct, brake_pct, battery_v, battery_temp_c, motor_current_a)
 ```
 
+`JOIN` glues two tables together, and `ON` says which column they share. `get_lap_summary` in
+`server.py` has an example: `JOIN samples s ON s.lap_id = l.lap_id` matches each sample to its lap.
+
 - **Task 1: `get_fastest_laps`.** Ask: *Who set the fastest lap, and in which run?*
 - **Task 2: `get_signal_peak`.** Ask: *What was the peak battery temperature in run 3, and on which lap?* Then figure out why.
 
@@ -84,7 +87,7 @@ Stuck? Run `python chat.py --server solutions/server_solution.py`.
    Small models often stop after one tool call, so ask a follow-up about anything unfamiliar.
 3. Add `run_sql(sql)` for any read-only SELECT. How often does the model get the SQL right?
 
-## Take it home (optional)
+## Take home (optional)
 
 - **Your own tool:** `compare_laps(run_id, lap_a, lap_b)`, or one that finds where the driver brakes hardest.
 - **A bigger model:** `ollama pull llama3.1:8b` (needs ~8 GB free RAM) and retry the stretch goals. What gets better?
