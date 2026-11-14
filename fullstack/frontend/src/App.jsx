@@ -1,36 +1,51 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 const statNames = {
-  hp: 'HP', attack: 'Attack', defense: 'Defense',
-  'special-attack': 'Sp. Atk', 'special-defense': 'Sp. Def', speed: 'Speed',
+  hp: "HP",
+  attack: "Attack",
+  defense: "Defense",
+  "special-attack": "Sp. Atk",
+  "special-defense": "Sp. Def",
+  speed: "Speed",
 };
-const formatName = (name) => name.replaceAll('-', ' ');
+const formatName = (name) => name.replaceAll("-", " ");
 
 function PokemonCard({ pokemon }) {
   const [imageFailed, setImageFailed] = useState(false);
-  const hp = pokemon.stats.find((stat) => stat.name === 'hp')?.value;
+  const hp = pokemon.stats.find((stat) => stat.name === "hp")?.value;
 
   return (
-    <article className={`pokemon-card type-${pokemon.types[0]}`} aria-label={`${formatName(pokemon.name)} Pokémon card`}>
+    <article
+      className={`pokemon-card type-${pokemon.types[0]}`}
+      aria-label={`${formatName(pokemon.name)} Pokémon card`}
+    >
       <header className="card-heading">
         <h1>{formatName(pokemon.name)}</h1>
-        <span className="hp"><small>HP</small> {hp}</span>
+        <span className="hp">
+          <small>HP</small> {hp}
+        </span>
       </header>
 
       <div className="artwork">
         {pokemon.image && !imageFailed ? (
-          <img src={pokemon.image} alt={formatName(pokemon.name)} onError={() => setImageFailed(true)} />
-        ) : <span>Artwork unavailable</span>}
+          <img
+            src={pokemon.image}
+            alt={formatName(pokemon.name)}
+            onError={() => setImageFailed(true)}
+          />
+        ) : (
+          <span>Artwork unavailable</span>
+        )}
       </div>
       <p className="measurements">
-        No. {String(pokemon.id).padStart(3, '0')}
+        No. {String(pokemon.id).padStart(3, "0")}
         <span>Height: {pokemon.height_m.toLocaleString()} m</span>
         <span>Weight: {pokemon.weight_kg.toLocaleString()} kg</span>
       </p>
 
       <section className="abilities" aria-label="Abilities">
         <h2>Abilities</h2>
-        <p>{pokemon.abilities.map(formatName).join(' · ')}</p>
+        <p>{pokemon.abilities.map(formatName).join(" · ")}</p>
       </section>
 
       <dl className="stats" aria-label="Base stats">
@@ -42,36 +57,49 @@ function PokemonCard({ pokemon }) {
         ))}
       </dl>
       <footer className="card-footer">
-        <span>{pokemon.types.join(' / ')}</span>
-        <span>#{String(pokemon.id).padStart(3, '0')} <span aria-hidden="true">✦</span></span>
+        <span>{pokemon.types.join(" / ")}</span>
+        <span>
+          #{String(pokemon.id).padStart(3, "0")}{" "}
+          <span aria-hidden="true">✦</span>
+        </span>
       </footer>
     </article>
   );
 }
 
 export default function App() {
-  const [input, setInput] = useState('');
-  const [search, setSearch] = useState({ name: 'bulbasaur' });
+  const [input, setInput] = useState("");
+  const [search, setSearch] = useState({ name: "bulbasaur" });
   const [pokemon, setPokemon] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
-    setError('');
+    setError("");
 
     async function fetchPokemon() {
       try {
-        const response = await fetch(`/api/pokemon/${encodeURIComponent(search.name)}`, { signal: controller.signal });
+        const response = await fetch(
+          `/api/pokemon/${encodeURIComponent(search.name)}`,
+          { signal: controller.signal },
+        );
         const data = await response.json();
-        if (!response.ok) throw new Error(typeof data.detail === 'string' ? data.detail : 'Something went wrong. Please try again.');
+        if (!response.ok)
+          throw new Error(
+            typeof data.detail === "string"
+              ? data.detail
+              : "Something went wrong. Please try again.",
+          );
         setPokemon(data);
       } catch (err) {
         if (controller.signal.aborted) return;
-        setError(err instanceof TypeError || err instanceof SyntaxError
-          ? 'Unable to reach the Pokédex. Check that the backend is running and try again.'
-          : err.message);
+        setError(
+          err instanceof TypeError || err instanceof SyntaxError
+            ? "Unable to reach the Pokédex. Check that the backend is running and try again."
+            : err.message,
+        );
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }
@@ -90,13 +118,15 @@ export default function App() {
   return (
     <main className="app">
       <form className="search-form" onSubmit={submit}>
-        <label className="sr-only" htmlFor="pokemon-search">Pokémon name or number. Press Enter to search.</label>
+        <label className="sr-only" htmlFor="pokemon-search">
+          Pokémon name or number. Press Enter to search.
+        </label>
         <input
           id="pokemon-search"
           type="search"
           value={input}
           onChange={(event) => setInput(event.target.value)}
-          placeholder="Search a Pokémon… press Enter"
+          placeholder="Search a Pokémon"
           enterKeyHint="search"
           autoComplete="off"
           spellCheck="false"
@@ -105,13 +135,27 @@ export default function App() {
         />
       </form>
 
-      <section className="result" aria-label="Search result" aria-busy={loading}>
-        <div className="sr-only" role="status">{!loading && !error && pokemon ? `${formatName(pokemon.name)} loaded.` : ''}</div>
+      <section
+        className="result"
+        aria-label="Search result"
+        aria-busy={loading}
+      >
+        <div className="sr-only" role="status">
+          {!loading && !error && pokemon
+            ? `${formatName(pokemon.name)} loaded.`
+            : ""}
+        </div>
         {loading ? (
-          <p className="message" role="status">Loading Pokémon…</p>
+          <p className="message" role="status">
+            Loading Pokémon…
+          </p>
         ) : error ? (
-          <p className="message error" role="alert">{error}</p>
-        ) : pokemon && <PokemonCard key={pokemon.id} pokemon={pokemon} />}
+          <p className="message error" role="alert">
+            {error}
+          </p>
+        ) : (
+          pokemon && <PokemonCard key={pokemon.id} pokemon={pokemon} />
+        )}
       </section>
     </main>
   );
