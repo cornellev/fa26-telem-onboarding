@@ -79,41 +79,46 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const controller = new AbortController();
-    setLoading(true);
-    setError("");
+  useEffect(
+    () => {
+      const controller = new AbortController();
+      setLoading(true);
+      setError("");
 
-    async function fetchPokemon() {
-      try {
-        const name = encodeURIComponent(search.name);
-        const response = await fetch(
-          "TODO: Fetch the right API endpoint from your backend",
-          { signal: controller.signal },
-        );
-        const data = await response.json();
-        if (!response.ok)
-          throw new Error(
-            typeof data.detail === "string"
-              ? data.detail
-              : "Something went wrong. Please try again.",
+      async function fetchPokemon() {
+        try {
+          const name = encodeURIComponent(search.name);
+          const response = await fetch(
+            "TODO: Fetch the right API endpoint from your backend",
+            { signal: controller.signal },
           );
-        setPokemon(data);
-      } catch (err) {
-        if (controller.signal.aborted) return;
-        setError(
-          err instanceof TypeError || err instanceof SyntaxError
-            ? "Unable to reach the Pokédex. Check that the backend is running and try again."
-            : err.message,
-        );
-      } finally {
-        if (!controller.signal.aborted) setLoading(false);
+          const data = await response.json();
+          if (!response.ok)
+            throw new Error(
+              typeof data.detail === "string"
+                ? data.detail
+                : "Something went wrong. Please try again.",
+            );
+          setPokemon(data);
+        } catch (err) {
+          if (controller.signal.aborted) return;
+          setError(
+            err instanceof TypeError || err instanceof SyntaxError
+              ? "Unable to reach the Pokédex. Check that the backend is running and try again."
+              : err.message,
+          );
+        } finally {
+          if (!controller.signal.aborted) setLoading(false);
+        }
       }
-    }
 
-    fetchPokemon();
-    return () => controller.abort();
-  }, [search]);
+      fetchPokemon();
+      return () => controller.abort();
+    },
+    [
+      /* TODO: Put the right dependency variable here */
+    ],
+  );
 
   function submit(event) {
     event.preventDefault();
