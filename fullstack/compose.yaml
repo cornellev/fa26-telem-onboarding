@@ -1,12 +1,12 @@
 services:
   backend:
-    build: ./backend
+    build: # TODO: Put the right build path here
     ports:
       - "8000:8000"
   frontend:
     build: ./frontend
     ports:
-      - "5173:5173"
+      - "" # TODO: Put the frontend port to serve to
     environment:
       BACKEND_URL: http://backend:8000
     depends_on:
